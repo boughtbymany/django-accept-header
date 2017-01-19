@@ -83,7 +83,17 @@ The ordered list of accepted mimetypes can also be used::
         for media_type in request.accepted_types:
             # do something
 
+You can also adjust the view's response based on the accept which response type the client can render well::
+
+    def some_view(request):
+        if request.best_match(['text/html', 'text/yaml']) == 'text/html':
+            # render HTML page
+        else:
+            # render YAML page
+
 See the full documentation for how to use the media types please see the full documentation.
+
+
 
 Documentation
 =============

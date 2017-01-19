@@ -163,7 +163,8 @@ def parse(value):
 def best_match(desired, accepted, default=None):
     """Returns the best match from a list of possible matches based
     on the quality of the client.  If two items have the same quality,
-    the one is returned that comes first.
+    the one is returned that comes first. This is based on a similar function
+    in Werkzeug.
 
     :param desired: a list of strings of mimetypes to check for
     :param accepted: a list of accepted :class MediaType:
