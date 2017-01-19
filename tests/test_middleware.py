@@ -78,3 +78,31 @@ class AcceptMiddlewareTest(unittest.TestCase):
         self.assertTrue(request.accepts('application/xhtml+xml'))
         self.assertTrue(request.accepts('application/xml'))
         self.assertFalse(request.accepts('image/png'))
+
+    def test_process_request_best_match(self):
+        request = Mock(
+            META={
+                'HTTP_ACCEPT': 'text/html,application/xhtml+xml;q=0.9,application/xml;q=0.9'
+            }
+        )
+        self.am.process_request(request)
+        self.assertEqual(
+            request.best_match(['application/xml', 'text/html', 'image/png']),
+            'text/html'
+        )
+        self.assertEqual(
+            request.best_match(['application/xml', 'application/xhtml+xml']),
+            'application/xml'
+        )
+        self.assertIsNone(request.best_match(['image/png']))
+        self.assertEqual(
+            request.best_match(['image/png'], default='text/plain'),
+            'text/plain'
+        )
+
+        request2 = Mock(META={'HTTP_ACCEPT': 'text/html,*/*;q=0.8'})
+        self.am.process_request(request2)
+        self.assertEqual(
+            request2.best_match(['image/png'], default='text/plain'),
+            'image/png'
+        )

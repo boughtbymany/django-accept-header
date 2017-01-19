@@ -15,10 +15,12 @@
 
 from __future__ import absolute_import
 
+from functools import partial
+
 from django import http
 
 from .exceptions import ParsingError
-from .header import parse
+from .header import parse, best_match
 
 
 class AcceptMiddleware(object):
@@ -30,3 +32,4 @@ class AcceptMiddleware(object):
             return http.HttpResponseBadRequest()
         setattr(request, 'accepted_types', acc)
         request.accepts = lambda mt: any(ma.matches(mt) for ma in acc)
+        request.best_match = partial(best_match, accepted=acc)

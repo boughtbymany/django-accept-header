@@ -18,7 +18,7 @@
 
 import unittest
 
-from django_accept_header.header import parse, MediaType
+from django_accept_header.header import parse, MediaType, best_match
 from django_accept_header.exceptions import MediaTypeValueError, SubtypeValueError
 
 
@@ -295,3 +295,40 @@ class MediaTypeTestCase(unittest.TestCase):
     def test_getitem_param_none(self):
         m = MediaType('application/json')
         self.assertIsNone(m['test'])
+
+
+class BestMatchTestCase(unittest.TestCase):
+
+    def test_best_match(self):
+        accepted = [
+            MediaType('text/plain', q=0.9),
+            MediaType('text/html', q=0.1),
+        ]
+        desired = ['text/html', 'text/plain']
+        self.assertEqual(best_match(desired, accepted), 'text/plain')
+
+    def test_use_first_in_desires_list_when_quality_is_equal(self):
+        accepted = [
+            MediaType('text/plain', q=0.9),
+            MediaType('text/html', q=0.9),
+        ]
+        desired = ['text/html', 'text/plain']
+        self.assertEqual(best_match(desired, accepted), 'text/html')
+
+    def test_use_default(self):
+        accepted = [
+            MediaType('text/plain', q=0.9),
+            MediaType('text/html', q=0.9),
+        ]
+        desired = ['image/png']
+        self.assertEqual(
+            best_match(desired, accepted, 'text/plain'), 'text/plain'
+        )
+
+    def test_return_none_if_no_match(self):
+        accepted = [
+            MediaType('text/plain', q=0.9),
+            MediaType('text/html', q=0.9),
+        ]
+        desired = ['image/png']
+        self.assertIsNone(best_match(desired, accepted))

@@ -158,3 +158,25 @@ def parse(value):
         )
     results.sort()
     return results
+
+
+def best_match(desired, accepted, default=None):
+    """Returns the best match from a list of possible matches based
+    on the quality of the client.  If two items have the same quality,
+    the one is returned that comes first.
+
+    :param desired: a list of strings of mimetypes to check for
+    :param accepted: a list of accepted :class MediaType:
+    :param default: the value that is returned if none match
+    """
+    best_quality = -1
+    result = default
+    for mimetype in desired:
+        for client_item in accepted:
+            if client_item.quality <= best_quality:
+                break
+            if client_item.matches(mimetype) \
+               and client_item.quality > 0:
+                best_quality = client_item.quality
+                result = mimetype
+    return result
